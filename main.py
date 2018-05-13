@@ -1,30 +1,27 @@
 import serial
 import threading as t
 import time
+import random
 import re
 import sys
-from PyQt5 import QtGui
+from PyQt5 import QtWidgets
+from MainWindow import Ui_MainWindow
 #from tkinter import *
-ser = serial.Serial('/dev/ttyUSB0')
+#ser = serial.Serial('/dev/ttyUSB0')
 w = 0
 
+class ApplicationWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(ApplicationWindow, self).__init__()
+
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
 def gui():
-  app = QtGui.QApplication(sys.argv)
-  win = QtGui.QWidget()
-  b = QtGui.QLabel(win)
-  b.setText("Hello World!")
-  win.setGeometry(100,100,200,50)
-  b.move(50,20)
-  win.show()
-  sys.exit(app.exec_())
-  """
-    master = Tk()
-    wlabel = StringVar()
-    global wlabel
-    Label(master, textvariable=wlabel).pack()
-    b = Button(master, text="Nyt Produkt", command=newProduct)
-    b.pack()
-    mainloop()"""
+    app = QtWidgets.QApplication(sys.argv)
+    application = ApplicationWindow()
+    application.show()
+    sys.exit(app.exec_())
 
 class myThread (t.Thread):
    def __init__(self, threadID, name, func):
@@ -32,7 +29,7 @@ class myThread (t.Thread):
       self.threadID = threadID
       self.name = name
       self.func = func
-   
+
    def run(self):
       print("Starting " + self.name)
       globals()[self.func]()
@@ -45,17 +42,19 @@ def logicLoop(initWeight):
 
 def newProduct():
     initialWeight = w
-    print("New product initial weight = " + str(initialWeight)) 
+    print("New product initial weight = " + str(initialWeight))
     logicLoop(initialWeight)
 
 def weightloop():
-    while(1):
-        global w
-        cweight = re.sub("[^\d+$.g]+", '', str(ser.readline()))
-        fweight = float(re.sub("[g]", '', cweight))
-        w = fweight
-        print(fweight)
-
+	while(1):
+		global w
+        #cweight = re.sub("[^\d+$.g]+", '', str(ser.readline()))
+        #fweight = float(re.sub("[g]", '', cweight))
+        #w = fweight
+		w = random.randint(0,100)
+		time.sleep(1)
+		#print(fweight)
+		print(w)
 
 weightthread = myThread(1, "Weightthread" , "weightloop")
 guithread = myThread(2 , "Gui" , "gui")
